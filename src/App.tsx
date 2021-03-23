@@ -4,8 +4,6 @@ import NavigationBar from './components/navigation-bar';
 import MainPage from './pages/main';
 import BasketDetailPage from './pages/basket-detail';
 
-import './App.css';
-
 const App: React.FC = () => (
   <div className="App">
     <BrowserRouter>
