@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { Link } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
@@ -25,6 +26,12 @@ const useStyles = makeStyles((theme) => ({
 const NavigationBar: React.FC = () => {
   const classes = useStyles();
 
+  // routeChange=()=> {
+  //   let path = `newPath`;
+  //   let history = useHistory();
+  //   history.push(path);
+  // }
+
   return (
     <div className={classes.root}>
       <AppBar position="static">
@@ -38,9 +45,11 @@ const NavigationBar: React.FC = () => {
             </IconButton>
           </Tooltip>
           <Tooltip title="Einstellungen">
-            <IconButton edge="start" className={classes.iconButton} color="inherit" aria-label="upload">
-              <SettingsIcon />
-            </IconButton>
+            <Link to="/settings">
+              <IconButton edge="start" className={classes.iconButton} color="inherit" aria-label="upload">
+                <SettingsIcon />
+              </IconButton>
+            </Link>
           </Tooltip>
           <Tooltip title="Benutzerkonto">
             <IconButton edge="start" className={classes.iconButton} color="inherit" aria-label="upload">
