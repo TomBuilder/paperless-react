@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Link } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
@@ -25,18 +25,13 @@ const useStyles = makeStyles((theme) => ({
 
 const NavigationBar: React.FC = () => {
   const classes = useStyles();
-
-  // routeChange=()=> {
-  //   let path = `newPath`;
-  //   let history = useHistory();
-  //   history.push(path);
-  // }
+  const history = useHistory();
 
   return (
     <div className={classes.root}>
       <AppBar position="static">
         <Toolbar>
-          <Typography variant="h4" className={classes.title}>
+          <Typography variant="h4" className={classes.title} onClick={() => { history.push('/'); }}>
             Paperless
           </Typography>
           <Tooltip title="Dokument hochladen">
@@ -45,14 +40,24 @@ const NavigationBar: React.FC = () => {
             </IconButton>
           </Tooltip>
           <Tooltip title="Einstellungen">
-            <Link to="/settings">
-              <IconButton edge="start" className={classes.iconButton} color="inherit" aria-label="upload">
-                <SettingsIcon />
-              </IconButton>
-            </Link>
+            <IconButton
+              edge="start"
+              className={classes.iconButton}
+              color="inherit"
+              aria-label="settings"
+              onClick={() => { history.push('settings'); }}
+            >
+              <SettingsIcon />
+            </IconButton>
           </Tooltip>
           <Tooltip title="Benutzerkonto">
-            <IconButton edge="start" className={classes.iconButton} color="inherit" aria-label="upload">
+            <IconButton
+              edge="start"
+              className={classes.iconButton}
+              color="inherit"
+              aria-label="account"
+              onClick={() => { history.push('account'); }}
+            >
               <AccountIcon />
             </IconButton>
           </Tooltip>
