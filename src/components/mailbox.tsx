@@ -61,19 +61,19 @@ interface Props {
 
 const Mailbox: React.FC<Props> = (props) => {
   const classes = useStyles();
-
+ 
   let footertext = 'heute';
-  let borderColor = useTheme().palette.primary.light;
+  let borderColor = useTheme().palette.success.light;
   const diffDays = Math.round(Math.abs(Date.now() - props.lastAccess.getTime()) / (1000 * 60 * 60 * 24));
   if (diffDays === 1) {
     footertext = 'gestern';
   } else if (diffDays > 1) {
     footertext = `Vor ${diffDays} Tagen`;
   }
-  if (diffDays > 2) {
-    borderColor = useTheme().palette.warning.light;
-  } else if (diffDays > 5) {
+  if (diffDays > 5) {
     borderColor = useTheme().palette.error.light;
+  } else if (diffDays > 2) {
+    borderColor = useTheme().palette.warning.light;
   }
 
   return (
