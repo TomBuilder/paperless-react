@@ -1,8 +1,18 @@
 import * as React from 'react';
-import { Snackbar, Button, IconButton } from '@material-ui/core';
+import { Snackbar, Box, IconButton } from '@material-ui/core';
+import { makeStyles, useTheme } from '@material-ui/core/styles';
 import MuiAlert, { AlertProps } from '@material-ui/lab/Alert';
 import axios from 'axios';
 import Mailbox from '../components/mailbox';
+
+const useStyles = makeStyles((theme) => ({
+  mailboxes: {
+    width: '100%',
+    display: 'flex',
+    flexWrap: 'wrap'
+  }
+})
+);
 
 enum PostboxType {
   General = 0,
@@ -26,6 +36,8 @@ function Alert(props: AlertProps) {
 }
 
 const MainPage: React.FC = () => {
+  const classes = useStyles();
+
   const [postboxes, setPostboxes] = React.useState<PostboxItem[]>([]);
   const [loaded, setLoaded] = React.useState<boolean>(false);
   const [error, setError] = React.useState<boolean>(false);
@@ -56,18 +68,51 @@ const MainPage: React.FC = () => {
   }, []);
 
   if (loaded) {
+    const filter = postboxes.filter(pb => pb.type === PostboxType.General);
+    const inbox = postboxes[postboxes.findIndex(pb => pb.type === PostboxType.Input)];
+
     return (
       <div>
-        {
-          postboxes.map((postBoxItem: PostboxItem) =>
+        <Box display='flex'>
+          <Box flexGrow='1'>
             <Mailbox
-              key={postBoxItem.id}
-              id={postBoxItem.id}
-              title={postBoxItem.name}
-              descripton={postBoxItem.description}
-              waitingDocs={postBoxItem.docCount}
-              lastAccess={new Date(postBoxItem.lastAccess)} />)
-        }
+              key={inbox.id}
+              id={inbox.id}
+              title={inbox.name}
+              descripton={inbox.description}
+              waitingDocs={inbox.docCount}
+              lastAccess={new Date(inbox.lastAccess)}
+            />
+          </Box>
+          <Mailbox
+            key={inbox.id}
+            id={inbox.id}
+            title={inbox.name}
+            descripton={inbox.description}
+            waitingDocs={inbox.docCount}
+            lastAccess={new Date(inbox.lastAccess)}
+          />
+          <Mailbox
+            key={inbox.id}
+            id={inbox.id}
+            title={inbox.name}
+            descripton={inbox.description}
+            waitingDocs={inbox.docCount}
+            lastAccess={new Date(inbox.lastAccess)}
+          />
+        </Box>
+        <Box display="flex" flexWrap="wrap">
+          {
+            filter.map((postBoxItem: PostboxItem) =>
+              <Mailbox
+                key={postBoxItem.id}
+                id={postBoxItem.id}
+                title={postBoxItem.name}
+                descripton={postBoxItem.description}
+                waitingDocs={postBoxItem.docCount}
+                lastAccess={new Date(postBoxItem.lastAccess)} />)
+          }
+        </Box>
       </div>
     );
   } else {
