@@ -1,4 +1,3 @@
-import * as React from 'react';
 import { Paper, Box, Typography, Chip, Tooltip } from '@material-ui/core';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 
@@ -54,17 +53,17 @@ const useStyles = makeStyles((theme) => ({
 interface Props {
   id: string;
   title: string;
-  descripton: string;
+  description: string;
   waitingDocs: number;
   lastAccess: Date;
 }
 
-const Mailbox: React.FC<Props> = (props) => {
+const Mailbox = ({ title, description, waitingDocs, lastAccess}: Props) => {
   const classes = useStyles();
- 
+
   let footertext = 'heute';
   let borderColor = useTheme().palette.success.light;
-  const diffDays = Math.round(Math.abs(Date.now() - props.lastAccess.getTime()) / (1000 * 60 * 60 * 24));
+  const diffDays = Math.round(Math.abs(Date.now() - lastAccess.getTime()) / (1000 * 60 * 60 * 24));
   if (diffDays === 1) {
     footertext = 'gestern';
   } else if (diffDays > 1) {
@@ -82,15 +81,15 @@ const Mailbox: React.FC<Props> = (props) => {
         <Box p={1} className={classes.stack}>
           <div className={classes.header}>
             <Tooltip title="Name des Postfachs" placement="bottom">
-              <Typography variant="h5" className={classes.title}>{props.title}</Typography>
+              <Typography variant="h5" className={classes.title}>{title}</Typography>
             </Tooltip>
             <Tooltip title="Anzahl Dokumente" placement="bottom">
-              <Chip label={props.waitingDocs} />
+              <Chip label={waitingDocs} />
             </Tooltip>
           </div>
           <div>
             <Tooltip title="Beschreibung" placement="bottom">
-              <Typography variant="body1" className={`${classes.multiLineEllipsis} ${classes.description}`}>{props.descripton}</Typography>
+              <Typography variant="body1" className={`${classes.multiLineEllipsis} ${classes.description}`}>{description}</Typography>
             </ Tooltip>
           </div>
           <div >

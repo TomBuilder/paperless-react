@@ -4,6 +4,8 @@ import { makeStyles, useTheme } from '@material-ui/core/styles';
 import MuiAlert, { AlertProps } from '@material-ui/lab/Alert';
 import axios from 'axios';
 import Mailbox from '../components/mailbox';
+import { useDrop } from 'react-dnd'
+import update from 'immutability-helper'
 
 const useStyles = makeStyles((theme) => ({
   mailboxes: {
@@ -39,6 +41,18 @@ const MainPage: React.FC = () => {
   const classes = useStyles();
 
   const [postboxes, setPostboxes] = React.useState<PostboxItem[]>([]);
+  const [inbox, setInbox] = React.useState<PostboxItem>({
+    id:'0', name:'?', description:'nicht definiert',
+    type:PostboxType.Input, docCount:0, lastUser:'?', lastAccess:new Date()
+  });
+  const [personalBox, setPersonalBox] = React.useState<PostboxItem>({
+    id:'1', name:'?', description:'nicht definiert',
+    type:PostboxType.Personal, docCount:0, lastUser:'?', lastAccess:new Date()
+  });
+  const [confidentialBox, setConfidentialBox] = React.useState<PostboxItem>({
+    id:'2', name:'?', description:'nicht definiert',
+    type:PostboxType.Confidential, docCount:0, lastUser:'?', lastAccess:new Date()
+  });
   const [loaded, setLoaded] = React.useState<boolean>(false);
   const [error, setError] = React.useState<boolean>(false);
   const url = 'https://localhost:5001/';
@@ -46,7 +60,11 @@ const MainPage: React.FC = () => {
   const getAllPostboxes = async () => {
     try {
       const response = await axios.get(`${url}postboxes`)
-      setPostboxes(response.data);
+      const boxes: PostboxItem[] = response.data;
+      setPostboxes(boxes.filter(pb => pb.type === PostboxType.General));
+      setInbox(boxes[boxes.findIndex(pb => pb.type === PostboxType.Input)])
+      setPersonalBox(boxes[boxes.findIndex(pb => pb.type === PostboxType.Personal)])
+      setConfidentialBox(boxes[boxes.findIndex(pb => pb.type === PostboxType.Confidential)])
       setLoaded(true);
     } catch {
       setError(true);
@@ -67,10 +85,18 @@ const MainPage: React.FC = () => {
 
   }, []);
 
-  if (loaded) {
-    const filter = postboxes.filter(pb => pb.type === PostboxType.General);
-    const inbox = postboxes[postboxes.findIndex(pb => pb.type === PostboxType.Input)];
+  const findCard = React.useCallback(
+    (id: string) => {
+      const card = postboxes.filter((c) => `${c.id}` === id)[0]
+      return {
+        card,
+        index: postboxes.indexOf(card),
+      }
+    },
+    [postboxes],
+  )
 
+  if (loaded) {
     return (
       <div>
         <Box display='flex'>
@@ -79,36 +105,36 @@ const MainPage: React.FC = () => {
               key={inbox.id}
               id={inbox.id}
               title={inbox.name}
-              descripton={inbox.description}
+              description={inbox.description}
               waitingDocs={inbox.docCount}
               lastAccess={new Date(inbox.lastAccess)}
             />
           </Box>
           <Mailbox
-            key={inbox.id}
-            id={inbox.id}
-            title={inbox.name}
-            descripton={inbox.description}
-            waitingDocs={inbox.docCount}
-            lastAccess={new Date(inbox.lastAccess)}
+            key={personalBox.id}
+            id={personalBox.id}
+            title={personalBox.name}
+            description={personalBox.description}
+            waitingDocs={personalBox.docCount}
+            lastAccess={new Date(personalBox.lastAccess)}
           />
           <Mailbox
-            key={inbox.id}
-            id={inbox.id}
-            title={inbox.name}
-            descripton={inbox.description}
-            waitingDocs={inbox.docCount}
-            lastAccess={new Date(inbox.lastAccess)}
+            key={confidentialBox.id}
+            id={confidentialBox.id}
+            title={confidentialBox.name}
+            description={confidentialBox.description}
+            waitingDocs={confidentialBox.docCount}
+            lastAccess={new Date(confidentialBox.lastAccess)}
           />
         </Box>
         <Box display="flex" flexWrap="wrap">
           {
-            filter.map((postBoxItem: PostboxItem) =>
+            postboxes.map((postBoxItem: PostboxItem) =>
               <Mailbox
                 key={postBoxItem.id}
                 id={postBoxItem.id}
                 title={postBoxItem.name}
-                descripton={postBoxItem.description}
+                description={postBoxItem.description}
                 waitingDocs={postBoxItem.docCount}
                 lastAccess={new Date(postBoxItem.lastAccess)} />)
           }
