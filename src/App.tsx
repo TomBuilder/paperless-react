@@ -1,5 +1,7 @@
 import * as React from 'react';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
+import { DndProvider } from 'react-dnd'
+import { HTML5Backend } from 'react-dnd-html5-backend'
 import NavigationBar from './components/navigation-bar';
 import MainPage from './pages/main';
 import BasketDetailPage from './pages/basket-detail';
@@ -21,7 +23,9 @@ const App: React.FC = () => (
           <AccountPage />
         </Route>
         <Route path="/">
-          <MainPage />
+          <DndProvider backend={HTML5Backend}>
+            <MainPage />
+          </DndProvider>
         </Route>
       </Switch>
     </BrowserRouter>

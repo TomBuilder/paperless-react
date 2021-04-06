@@ -1,5 +1,7 @@
 import { Paper, Box, Typography, Chip, Tooltip } from '@material-ui/core';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
+import { useDrag, useDrop } from 'react-dnd';
+import { ItemTypes } from '../itemTypes'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -56,10 +58,50 @@ interface Props {
   description: string;
   waitingDocs: number;
   lastAccess: Date;
+  moveBox: (id: string, to: number) => void;
+  findBox: (id: string) => { index: number };
 }
 
-const Mailbox = ({ title, description, waitingDocs, lastAccess}: Props) => {
+interface Item {
+  id: string;
+  originalIndex: number;
+}
+
+const Mailbox = ({ id, title, description, waitingDocs, lastAccess, moveBox, findBox }: Props) => {
   const classes = useStyles();
+  const originalIndex = findBox(id).index;
+
+  const [{ isDragging }, drag] = useDrag(
+    () => ({
+      type: ItemTypes.MAILBOX,
+      item: { id, originalIndex },
+      collect: (monitor) => ({
+        isDragging: monitor.isDragging(),
+      }),
+      end: (item, monitor) => {
+        const { id: droppedId, originalIndex } = item
+        const didDrop = monitor.didDrop()
+        if (!didDrop) {
+          moveBox(droppedId, originalIndex)
+        }
+      },
+    }),
+    [id, originalIndex, moveBox],
+  )
+
+  const [, drop] = useDrop(
+    () => ({
+      accept: ItemTypes.MAILBOX,
+      canDrop: () => false,
+      hover({ id: draggedId }: Item) {
+        if (draggedId !== id) {
+          const { index: overIndex } = findBox(id)
+          moveBox(draggedId, overIndex)
+        }
+      },
+    }),
+    [findBox, moveBox],
+  )
 
   let footertext = 'heute';
   let borderColor = useTheme().palette.success.light;
@@ -75,25 +117,26 @@ const Mailbox = ({ title, description, waitingDocs, lastAccess}: Props) => {
     borderColor = useTheme().palette.warning.light;
   }
 
+  const opacity = isDragging ? 0 : 1
   return (
-    <div className={classes.root}>
+    <div className={classes.root} ref={(node) => drag(drop(node))} style={{ opacity }}>
       <Paper className={classes.paper} elevation={5}>
         <Box p={1} className={classes.stack}>
           <div className={classes.header}>
-            <Tooltip title="Name des Postfachs" placement="bottom">
+            <Tooltip title="Name des Postfachs" placement="bottom" enterDelay={1000}>
               <Typography variant="h5" className={classes.title}>{title}</Typography>
             </Tooltip>
-            <Tooltip title="Anzahl Dokumente" placement="bottom">
+            <Tooltip title="Anzahl Dokumente" placement="bottom" enterDelay={1000}>
               <Chip label={waitingDocs} />
             </Tooltip>
           </div>
           <div>
-            <Tooltip title="Beschreibung" placement="bottom">
+            <Tooltip title="Beschreibung" placement="bottom" enterDelay={1000}>
               <Typography variant="body1" className={`${classes.multiLineEllipsis} ${classes.description}`}>{description}</Typography>
             </ Tooltip>
           </div>
           <div >
-            <Tooltip title="Letzter Zugriff" placement="bottom">
+            <Tooltip title="Letzter Zugriff" placement="bottom" enterDelay={1000}>
               <Typography style={{ borderColor }} variant="body1" className={classes.lastAccess}>{footertext}</Typography>
             </Tooltip>
           </div>
