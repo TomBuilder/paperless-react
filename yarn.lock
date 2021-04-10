@@ -1533,6 +1533,11 @@
     mkdirp "^1.0.4"
     rimraf "^3.0.2"
 
+"@pdftron/webviewer@^7.3.1":
+  version "7.3.1"
+  resolved "https://registry.yarnpkg.com/@pdftron/webviewer/-/webviewer-7.3.1.tgz#0fff099b650a4c8c700bac566fd22c7385b3e1ff"
+  integrity sha512-uoCwA0Ueqd7DdAGaUPdCB8aVKgZNr5JMJeBkR70EJx04eyGofp7TB+AvIE5oQdzVtnruBR8oSONgnP2kWI+Msg==
+
 "@pmmmwh/react-refresh-webpack-plugin@0.4.3":
   version "0.4.3"
   resolved "https://registry.yarnpkg.com/@pmmmwh/react-refresh-webpack-plugin/-/react-refresh-webpack-plugin-0.4.3.tgz#1eec460596d200c0236bf195b078a5d1df89b766"

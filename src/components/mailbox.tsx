@@ -1,3 +1,4 @@
+import { useHistory } from 'react-router-dom';
 import { Paper, Box, Typography, Chip, Tooltip } from '@material-ui/core';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import { useDrag, useDrop } from 'react-dnd';
@@ -68,6 +69,7 @@ interface Item {
 }
 
 const Mailbox = ({ id, title, description, waitingDocs, lastAccess, moveBox, findBox }: Props) => {
+  let history = useHistory();
   const classes = useStyles();
   const originalIndex = findBox(id).index;
 
@@ -117,9 +119,14 @@ const Mailbox = ({ id, title, description, waitingDocs, lastAccess, moveBox, fin
     borderColor = useTheme().palette.warning.light;
   }
 
+  const handleDoubleClick = (event: React.MouseEvent<HTMLDivElement>) => {
+    history.push(`/details/${id}`);
+  }
+
   const opacity = isDragging ? 0 : 1
   return (
-    <div className={classes.root} ref={(node) => drag(drop(node))} style={{ opacity }}>
+    <div className={classes.root} ref={(node) => drag(drop(node))} style={{ opacity }} 
+    onDoubleClick={handleDoubleClick} >
       <Paper className={classes.paper} elevation={5}>
         <Box p={1} className={classes.stack}>
           <div className={classes.header}>
