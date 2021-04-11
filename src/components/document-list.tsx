@@ -14,7 +14,7 @@ type DocumentItem = {
   lastAccess: Date,
 }
 
-type TParams = { id: string, docidChanged: (docid: string) => void };
+type TParams = { id: string, docidChanged: (docid: string, filename: string) => void };
 
 function Alert(props: AlertProps) {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
@@ -55,7 +55,7 @@ const DocumentList = ({ id, docidChanged }: TParams) => {
     index: number,
   ) => {
     setSelectedIndex(index);
-    docidChanged(doclist[index].id);
+    docidChanged(doclist[index].id, doclist[index].fileName);
   };
 
   if (loaded) {

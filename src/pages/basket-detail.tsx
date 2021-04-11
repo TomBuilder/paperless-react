@@ -9,10 +9,12 @@ type TParams = { id: string };
 const BasketDetailPage = () => {
   const params: TParams = useParams();
   const [docid, setDocid] = React.useState('');
+  const [filename, setFilename] = React.useState('');
 
-  const docidChanged = (docid: string) => {
+  const docidChanged = (docid: string, filename: string) => {
     setDocid(docid);
-    console.log(`Neue DocId: ${docid}`);
+    setFilename(filename);
+    console.log(`Neue DocId: ${docid} / ${filename}`);
   }
 
   return (
@@ -21,7 +23,7 @@ const BasketDetailPage = () => {
         <DocumentList id={params.id} docidChanged={docidChanged}></DocumentList>
       </Box>
       <Box flexGrow='1'>
-        <PdfViewer docid={docid} filename=''></PdfViewer>
+        <PdfViewer docid={docid} filename={filename}></PdfViewer>
       </Box>
     </Box>
   )
