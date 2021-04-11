@@ -4,7 +4,8 @@ import { makeStyles } from '@material-ui/core/styles';
 import {
   AppBar, Toolbar, Button, IconButton, Typography, Tooltip,
 } from '@material-ui/core';
-import { PublishRounded, AccountCircle, Settings } from '@material-ui/icons';
+import { AccountCircle, Settings } from '@material-ui/icons';
+import UploadDialog from '../components/upload-dialog'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -30,9 +31,7 @@ const NavigationBar: React.FC = () => {
             Paperless
           </Typography>
           <Tooltip title="Dokument hochladen">
-            <IconButton edge="start" className={classes.iconButton} color="inherit" aria-label="upload">
-              <PublishRounded />
-            </IconButton>
+            <UploadDialog />
           </Tooltip>
           <Tooltip title="Einstellungen">
             <IconButton
