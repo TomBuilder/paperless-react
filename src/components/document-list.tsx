@@ -1,6 +1,6 @@
 import * as React from 'react';
 import axios from 'axios';
-import { Snackbar } from '@material-ui/core';
+import { Snackbar, List, ListItem, ListItemText } from '@material-ui/core';
 import MuiAlert, { AlertProps } from '@material-ui/lab/Alert';
 
 type DocumentItem = {
@@ -14,16 +14,18 @@ type DocumentItem = {
   lastAccess: Date,
 }
 
-type TParams = { id: string };
+type TParams = { id: string, docidChanged: (docid: string) => void };
 
 function Alert(props: AlertProps) {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
 }
 
-const DocumentList = ({ id }: TParams) => {
+const DocumentList = ({ id, docidChanged }: TParams) => {
   const [doclist, setDoclist] = React.useState<DocumentItem[]>([]);
   const [loaded, setLoaded] = React.useState<boolean>(false);
   const [error, setError] = React.useState<boolean>(false);
+  const [selectedIndex, setSelectedIndex] = React.useState(-1);
+
   const url = 'https://localhost:5001/';
 
   const getAllDocuments = async () => {
@@ -48,12 +50,24 @@ const DocumentList = ({ id }: TParams) => {
     getAllDocuments();
   }, []);
 
+  const handleListItemClick = (
+    event: React.MouseEvent<HTMLDivElement, MouseEvent>,
+    index: number,
+  ) => {
+    setSelectedIndex(index);
+    docidChanged(doclist[index].id);
+  };
+
   if (loaded) {
     return (
-      <div> {
-        doclist.map((docItem: DocumentItem) =>
-          <div>Detail-Ansicht {docItem.title}</div>
-        )}
+      <div>
+        <List>{
+          doclist.map((docItem: DocumentItem, index: number) =>
+            <ListItem button key={docItem.id} selected={selectedIndex === index} onClick={(event) => handleListItemClick(event, index)}>
+              <ListItemText primary={docItem.title} />
+            </ListItem>
+          )}
+        </List>
       </div>
     )
   } else {
