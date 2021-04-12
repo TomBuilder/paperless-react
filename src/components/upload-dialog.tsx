@@ -23,6 +23,7 @@ import MuiDialogTitle from '@material-ui/core/DialogTitle';
 import MuiDialogContent from '@material-ui/core/DialogContent';
 import MuiDialogActions from '@material-ui/core/DialogActions';
 import { Close, PublishRounded } from '@material-ui/icons';
+import axios from 'axios';
 
 const styles = (theme: Theme) =>
   createStyles({
@@ -64,11 +65,19 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
+type DocumentType = {
+  id: string,
+  name: string,
+  targetPostboxes: string[]
+}
+
 export interface DialogTitleProps extends WithStyles<typeof styles> {
   id: string;
   children: React.ReactNode;
   onClose: () => void;
 }
+
+const url = 'https://localhost:5001/';
 
 const DialogTitle = withStyles(styles)((props: DialogTitleProps) => {
   const { children, classes, onClose, ...other } = props;
@@ -105,11 +114,22 @@ const UploadDialog = () => {
   const [open, setOpen] = React.useState(false);
   const [filedata, setFiledata] = React.useState<FileList | null>(null);
   const [filename, setFilename] = React.useState('');
-  const [doctype, setDoctype] = React.useState<unknown>('Typ 1');
+  const [doctype, setDoctype] = React.useState<unknown>('');
   const [mailbox, setMailbox] = React.useState<unknown>('Fach 1');
+  const [doctypes, setDoctypes] = React.useState<DocumentType[]>([]);
 
   const classes = useStyles();
 
+  React.useEffect(() => {
+    getAllDoctypes();
+  }, [])
+
+  const getAllDoctypes = async () => {
+    const responseTypes = await axios.get(`${url}documents/types`);
+    setDoctypes(responseTypes.data);
+    setDoctype(responseTypes.data[0].name);
+  }
+  
   const handleClickOpen = () => {
     setFilename('Dateiname');
     setFiledata(null);
@@ -210,9 +230,14 @@ const UploadDialog = () => {
                   handleTypeChange(event);
                 }}
               >
-                <MenuItem value={'Typ 1'}>Typ 1</MenuItem>
+                {
+                  doctypes.map((item: DocumentType) => {
+                    <MenuItem value={item.name}>Typ 1</MenuItem>
+                  })
+                }
+                {/* <MenuItem value={'Typ 1'}>Typ 1</MenuItem>
                 <MenuItem value={'Typ 2'}>Typ 2</MenuItem>
-                <MenuItem value={'Typ 2'}>Typ 3</MenuItem>
+                <MenuItem value={'Typ 2'}>Typ 3</MenuItem> */}
               </Select>
             </FormControl>
             <FormControl className={classes.formControl}>
