@@ -26,11 +26,9 @@ const DocumentList = ({ id, docidChanged }: TParams) => {
   const [error, setError] = React.useState<boolean>(false);
   const [selectedIndex, setSelectedIndex] = React.useState(-1);
 
-  const url = 'https://localhost:5001/';
-
   const getAllDocuments = async () => {
     try {
-      const response = await axios.get(`${url}documents?searchstring=postboxid[eq]${id}`)
+      const response = await axios.get(`${process.env.REACT_APP_BASEURL}documents?searchstring=postboxid[eq]${id}`)
       setDoclist(response.data);
       setLoaded(true);
     } catch {

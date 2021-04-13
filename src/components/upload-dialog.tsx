@@ -90,8 +90,6 @@ export interface DialogTitleProps extends WithStyles<typeof styles> {
   onClose: () => void;
 }
 
-const url = 'https://localhost:5001/';
-
 const DialogTitle = withStyles(styles)((props: DialogTitleProps) => {
   const { children, classes, onClose, ...other } = props;
   return (
@@ -134,22 +132,33 @@ const UploadDialog = () => {
     targetPostboxes: []
   });
   const [postboxes, setPostboxes] = React.useState<PostboxItem[]>([]);
-  let aktPostbox: PostboxItem = { id: '', name: '' };
-
+  const [aktPostbox, setAktPostbox] = React.useState<PostboxItem>({
+    id: '',
+    name: ''
+  });
+  const [visiblePostboxes, setVisiblePostboxes] = React.useState<PostboxItem[]>([]);
   const classes = useStyles();
 
   React.useEffect(() => {
     getAllDoctypes();
   }, [open]);
 
+  React.useEffect(() => {
+    calculateVisiblePostboxes();
+  }, [aktDoctype]);
+
   const getAllDoctypes = async () => {
     if (doctypes.length < 1) {
-      const responseTypes = await axios.get(`${url}documents/types`);
+      const responseTypes = await axios.get(
+        `${process.env.REACT_APP_BASEURL}documents/types`
+      );
       setDoctypes(responseTypes.data);
       setDoctype(responseTypes.data[0]);
-      const responseBoxes = await axios.get(`${url}postboxes`);
+      const responseBoxes = await axios.get(
+        `${process.env.REACT_APP_BASEURL}postboxes`
+      );
       setPostboxes(responseBoxes.data);
-      aktPostbox = responseBoxes.data[0];
+      setAktPostbox(responseBoxes.data[0]);
     }
   };
 
@@ -172,12 +181,15 @@ const UploadDialog = () => {
         postboxId: aktPostbox.id,
         state: 0
       };
-      let createResponse = await axios.post(`${url}documents`, docItem);
+      let createResponse = await axios.post(
+        `${process.env.REACT_APP_BASEURL}documents`,
+        docItem
+      );
       if (createResponse.status === 201) {
         let data = new FormData();
         data.append('file', filedata[0]);
         await axios.post(
-          `${url}documents/${createResponse.data.id}/content`,
+          `${process.env.REACT_APP_BASEURL}documents/${createResponse.data.id}/content`,
           data
         );
       }
@@ -213,25 +225,25 @@ const UploadDialog = () => {
   ) => {
     if (event?.target?.value) {
       const postbox = postboxes.find((p) => p.id === event.target.value);
-      aktPostbox = postbox ? postbox : { id: '', name: '' };
+      setAktPostbox(postbox ? postbox : { id: '', name: '' });
     }
   };
 
-  let visiblePostboxes: PostboxItem[] = [];
   const calculateVisiblePostboxes = () => {
-    if (aktDoctype) {
+    if (aktDoctype.id !== '') {
+      const tempVisisbleBoxes: PostboxItem[] = [];
       for (let boxid of aktDoctype.targetPostboxes) {
         const box = postboxes.find((p) => p.id === boxid);
         if (box) {
-          visiblePostboxes.push(box);
+          tempVisisbleBoxes.push(box);
         }
       }
-      if (visiblePostboxes.length > 0) {
-        aktPostbox = visiblePostboxes[0];
+      setVisiblePostboxes(tempVisisbleBoxes);
+      if (tempVisisbleBoxes.length > 0 && aktPostbox !== tempVisisbleBoxes[0]) {
+        setAktPostbox(tempVisisbleBoxes[0]);
       }
     }
   };
-  calculateVisiblePostboxes();
 
   return (
     <div>

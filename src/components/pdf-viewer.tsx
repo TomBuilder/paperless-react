@@ -3,7 +3,6 @@ import axios from 'axios';
 import WebViewer, { WebViewerInstance } from '@pdftron/webviewer'
 
 type TParams = { docid: string, filename: string };
-const url = 'https://localhost:5001/';
 
 const PdfViewer = ({ docid, filename }: TParams) => {
 
@@ -26,7 +25,7 @@ const PdfViewer = ({ docid, filename }: TParams) => {
         }
       } else {
         //docViewer.loadDocument('/files/pdftron_about.pdf');
-        const response = await axios.get(`${url}documents/${docid}/content`, { responseType: 'arraybuffer' })
+        const response = await axios.get(`${process.env.REACT_APP_BASEURL}documents/${docid}/content`, { responseType: 'arraybuffer' })
         const blob = new Blob([response.data], { type: 'application/pdf' });
         instance.docViewer.loadDocument(blob, { extension: 'pdf' });
         instance.setHeaderItems(header => {
@@ -51,7 +50,7 @@ const PdfViewer = ({ docid, filename }: TParams) => {
       const fileData = new Uint8Array(await doc.getFileData({ xfdfString }));
       const blob = new Blob([fileData], { type: 'application/pdf' });
       data.append('documentContent', blob, filename);
-      await axios.put(`${url}documents/${docid}/content`, data, { headers: { "Content-Type": "multipart/form-data" }, })
+      await axios.put(`${process.env.REACT_APP_BASEURL}documents/${docid}/content`, data, { headers: { "Content-Type": "multipart/form-data" }, })
     }
   }
 

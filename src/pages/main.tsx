@@ -44,11 +44,10 @@ const MainPage: React.FC = () => {
   });
   const [loaded, setLoaded] = React.useState<boolean>(false);
   const [error, setError] = React.useState<boolean>(false);
-  const url = 'https://localhost:5001/';
-
+  
   const getAllPostboxes = async () => {
     try {
-      const response = await axios.get(`${url}postboxes`)
+      const response = await axios.get(`${process.env.REACT_APP_BASEURL}postboxes`)
       const boxes: PostboxItem[] = response.data;
       setPostboxes(boxes.filter(pb => pb.type === PostboxType.General));
       setInbox(boxes[boxes.findIndex(pb => pb.type === PostboxType.Input)])
