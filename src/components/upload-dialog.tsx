@@ -61,20 +61,20 @@ const useStyles = makeStyles((theme) => ({
   },
   formControl: {
     margin: theme.spacing(1),
-    minWidth: 220,
+    minWidth: 220
   }
 }));
 
 type DocumentType = {
-  id: string,
-  name: string,
-  targetPostboxes: string[]
-}
+  id: string;
+  name: string;
+  targetPostboxes: string[];
+};
 
 type PostboxItem = {
-  id: string,
-  name: string,
-}
+  id: string;
+  name: string;
+};
 
 export interface DialogTitleProps extends WithStyles<typeof styles> {
   id: string;
@@ -120,15 +120,19 @@ const UploadDialog = () => {
   const [filedata, setFiledata] = React.useState<FileList | null>(null);
   const [filename, setFilename] = React.useState('');
   const [doctypes, setDoctypes] = React.useState<DocumentType[]>([]);
-  const [aktDoctype, setDoctype] = React.useState<DocumentType>({id:'', name:'', targetPostboxes:[]});
+  const [aktDoctype, setDoctype] = React.useState<DocumentType>({
+    id: '',
+    name: '',
+    targetPostboxes: []
+  });
   const [postboxes, setPostboxes] = React.useState<PostboxItem[]>([]);
-  const [aktPostbox, setPostbox] = React.useState<PostboxItem>({id:'', name:''});
-  
+  let aktPostbox: PostboxItem = {id: '', name: ''};
+
   const classes = useStyles();
 
   React.useEffect(() => {
     getAllDoctypes();
-  }, [open])
+  }, [open]);
 
   const getAllDoctypes = async () => {
     if (doctypes.length < 1) {
@@ -137,9 +141,9 @@ const UploadDialog = () => {
       setDoctype(responseTypes.data[0]);
       const responseBoxes = await axios.get(`${url}postboxes`);
       setPostboxes(responseBoxes.data);
-      setPostbox(responseBoxes.data[0]);
+      aktPostbox = responseBoxes.data[0];
     }
-  }
+  };
 
   const handleClickOpen = () => {
     setFilename('Dateiname');
@@ -165,8 +169,8 @@ const UploadDialog = () => {
     }>
   ) => {
     if (event?.target?.value) {
-      const doctype = doctypes.find(d => d.id === event.target.value); 
-      setDoctype(doctype ? doctype : {id:'', name:'', targetPostboxes:[]});
+      const doctype = doctypes.find((d) => d.id === event.target.value);
+      setDoctype(doctype ? doctype : { id: '', name: '', targetPostboxes: [] });
     }
   };
 
@@ -177,10 +181,26 @@ const UploadDialog = () => {
     }>
   ) => {
     if (event?.target?.value) {
-      const postbox = postboxes.find(p => p.id === event.target.value); 
-      setPostbox(postbox ? postbox : {id:'', name:''})
+      const postbox = postboxes.find((p) => p.id === event.target.value);
+      aktPostbox = postbox ? postbox : { id: '', name: '' };
     }
   };
+
+  let visiblePostboxes: PostboxItem[] = [];
+  const calculateVisiblePostboxes = () => {
+    if (aktDoctype) {
+      for (let boxid of aktDoctype.targetPostboxes) {
+        const box = postboxes.find(p => p.id === boxid)
+        if(box) {
+          visiblePostboxes.push(box);
+        }
+      }
+      if(visiblePostboxes.length > 0) {
+        aktPostbox = visiblePostboxes[0];
+      }
+    }
+  };
+  calculateVisiblePostboxes();
 
   return (
     <div>
@@ -232,35 +252,35 @@ const UploadDialog = () => {
           </Box>
           <Box className={classes.selectRow}>
             <FormControl className={classes.formControl}>
-              <InputLabel>
-                Dokument-Typ
-              </InputLabel>
+              <InputLabel>Dokument-Typ</InputLabel>
               <Select
-                labelId='select-doctype-label'
-                id='select-doctype'
+                labelId="select-doctype-label"
+                id="select-doctype"
                 value={aktDoctype.id}
                 onChange={(event) => {
                   handleTypeChange(event);
                 }}
               >
-                {doctypes.map((docItem) =>
-                  <MenuItem key={docItem.id} value={docItem.id}>{docItem.name}</MenuItem>
-                )}
+                {doctypes.map((docItem) => (
+                  <MenuItem key={docItem.id} value={docItem.id}>
+                    {docItem.name}
+                  </MenuItem>
+                ))}
               </Select>
             </FormControl>
             <FormControl className={classes.formControl}>
-              <InputLabel>
-                Postfach
-              </InputLabel>
+              <InputLabel>Postfach</InputLabel>
               <Select
-                labelId='select-mailbox-label'
-                id='select-mailbox'
+                labelId="select-mailbox-label"
+                id="select-mailbox"
                 value={aktPostbox.id}
                 onChange={handleBoxChange}
               >
-                {postboxes.map((postbox) =>
-                  <MenuItem key={postbox.id} value={postbox.id}>{postbox.name}</MenuItem>
-                )}
+                {visiblePostboxes.map((postbox) => (
+                  <MenuItem key={postbox.id} value={postbox.id}>
+                    {postbox.name}
+                  </MenuItem>
+                ))}
               </Select>
             </FormControl>
           </Box>
