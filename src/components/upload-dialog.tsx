@@ -71,6 +71,14 @@ type DocumentType = {
   targetPostboxes: string[];
 };
 
+type DocumentItem = {
+  title: string;
+  typeId: string;
+  fileName: string;
+  postboxId: string;
+  state: number;
+};
+
 type PostboxItem = {
   id: string;
   name: string;
@@ -126,7 +134,7 @@ const UploadDialog = () => {
     targetPostboxes: []
   });
   const [postboxes, setPostboxes] = React.useState<PostboxItem[]>([]);
-  let aktPostbox: PostboxItem = {id: '', name: ''};
+  let aktPostbox: PostboxItem = { id: '', name: '' };
 
   const classes = useStyles();
 
@@ -150,8 +158,31 @@ const UploadDialog = () => {
     setFiledata(null);
     setOpen(true);
   };
+
   const handleClose = () => {
     setOpen(false);
+  };
+
+  const handleUpload = async () => {
+    if (filedata) {
+      let docItem: DocumentItem = {
+        title: filename,
+        fileName: filename,
+        typeId: aktDoctype.id,
+        postboxId: aktPostbox.id,
+        state: 0
+      };
+      let createResponse = await axios.post(`${url}documents`, docItem);
+      if (createResponse.status === 201) {
+        let data = new FormData();
+        data.append('file', filedata[0]);
+        await axios.post(
+          `${url}documents/${createResponse.data.id}/content`,
+          data
+        );
+      }
+    }
+    handleClose();
   };
 
   const handleFiles = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -190,12 +221,12 @@ const UploadDialog = () => {
   const calculateVisiblePostboxes = () => {
     if (aktDoctype) {
       for (let boxid of aktDoctype.targetPostboxes) {
-        const box = postboxes.find(p => p.id === boxid)
-        if(box) {
+        const box = postboxes.find((p) => p.id === boxid);
+        if (box) {
           visiblePostboxes.push(box);
         }
       }
-      if(visiblePostboxes.length > 0) {
+      if (visiblePostboxes.length > 0) {
         aktPostbox = visiblePostboxes[0];
       }
     }
@@ -286,7 +317,7 @@ const UploadDialog = () => {
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button autoFocus onClick={handleClose} color="primary">
+          <Button autoFocus onClick={handleUpload} color="primary">
             importieren
           </Button>
         </DialogActions>
